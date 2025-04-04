@@ -2,8 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
-import swaggerUi from "swagger-ui-express";
-import swaggerJsDoc from "swagger-jsdoc";
+
 import { connectDB } from "./config/db";
 import authRoutes from "./routes/authRoutes";
 import productRoutes from "./routes/productRoutes";
@@ -22,19 +21,7 @@ app.use(helmet());
 connectDB();
 
 
-const swaggerOptions = {
-  swaggerDefinition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Multi-Vendor Order API",
-      version: "1.0.0",
-      description: "API Documentation for Multi-Vendor Order Management System",
-    },
-  },
-  apis: ["./routes/*.ts"],
-};
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 
 app.use("/auth", authRoutes);
 app.use("/products", productRoutes);
