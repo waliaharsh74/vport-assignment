@@ -5,10 +5,11 @@ import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsDoc from "swagger-jsdoc";
 import { connectDB } from "./config/db";
-import { redisClient } from "./config/redis";
 import authRoutes from "./routes/authRoutes";
 import productRoutes from "./routes/productRoutes";
 import orderRoutes from "./routes/orderRoutes";
+import analyticsRoutes from "./routes/analyticsRoutes";
+
 
 dotenv.config();
 const app = express();
@@ -19,7 +20,7 @@ app.use(cors());
 app.use(helmet());
 
 connectDB();
-redisClient.connect();
+
 
 const swaggerOptions = {
   swaggerDefinition: {
@@ -37,6 +38,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.use("/auth", authRoutes);
 app.use("/products", productRoutes);
+app.use("/analytics", analyticsRoutes);
 app.use("/orders", orderRoutes);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

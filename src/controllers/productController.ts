@@ -16,28 +16,46 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
     }
 };
 
-export const updateProduct = async (req: Request, res: Response) => {
+export const updateProduct = async (req: AuthRequest, res: Response) => {
     try {
         const { id } = req.params;
         const updates = req.body;
-
-        const product = await Product.findByIdAndUpdate(id, updates, { new: true });
+        const product = await Product.findById(id);
+        const userId = req.user.id;
         if (!product) {
-            res.status(404).json({ message: "Product not found" });
+             res.status(404).json({ message: "Product not found" });
             return
         }
-        res.json({ message: "Product updated successfully", product });
+
+        if (product.vendorId.toString() !== userId) {
+            res.status(403).json({ message: "Unauthorized: You can only update your own products" });
+            return
+        }
+
+        const updatedProduct = await Product.findByIdAndUpdate(id, updates, { new: true });
+        res.json({ message: "Product updated successfully", product: updatedProduct });
     } catch (error) {
         res.status(500).json({ message: "Server error", error });
     }
 };
 
-export const deleteProduct = async (req: Request, res: Response) => {
+export const deleteProduct = async (req: AuthRequest, res: Response) => {
     try {
         const { id } = req.params;
-
-        const product = await Product.findByIdAndDelete(id);
+        const product = await Product.findById(id);
+        const userId = req.user.id;
         if (!product) {
+             res.status(404).json({ message: "Product not found" });
+            return
+        }
+
+        if (product.vendorId.toString() !== userId) {
+            res.status(403).json({ message: "Unauthorized: You can only update your own products" });
+            return
+        }
+
+        const deletedProduct = await Product.findByIdAndDelete(id);
+        if (!deletedProduct) {
             res.status(404).json({ message: "Product not found" });
             return
         }
